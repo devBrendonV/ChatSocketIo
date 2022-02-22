@@ -11,7 +11,9 @@ const Container = styled.div`
   height: 100vh;
   background-color: black;
 `;
-
+const CardLogin = styled.div`
+  display: flex;
+`
 function App() {
   const [nome, setNome] = useState("");
   const [sala, setSala] = useState("");
@@ -24,7 +26,7 @@ function App() {
 
   return (
     <Container className="App">
-      <div>
+      <CardLogin>
         <h3>Chat de conversa</h3>
         <input
           type="text"
@@ -41,7 +43,7 @@ function App() {
           }}
         />
         <button onClick={() => logar()}>Entrar na sala</button>
-      </div>
+      </CardLogin>
       <Chat socket={socket} nome={nome} sala={sala} />
     </Container>
   );

@@ -1,19 +1,13 @@
 import React, { useState, useEffect } from "react";
 import ScrollToBottom from "react-scroll-to-bottom";
-import { Container } from "./styles";
+import { Container, Mensagem } from "./styles";
 const Chat = ({ socket, nome, sala }) => {
   const [mensagem, setMensagem] = useState("");
   const [mensagens, setMensagens] = useState([]);
-  let arr = [];
-  function mapear() {
-    console.log(arr);
-    const alterado = arr.map((recebido) => {
-      return <div>{recebido}</div>;
-    });
-    setMensagens(alterado);
-  }
+  let arr = [""];
+
   const enviarMensagem = async () => {
-    if (mensagem !== "") {
+    if (mensagem.trim().length > 0) {
       const mensagemAtual = {
         sala: sala,
         usuario: nome,
@@ -24,24 +18,59 @@ const Chat = ({ socket, nome, sala }) => {
           new Date(Date.now()).getMinutes(),
       };
       await socket.emit("send_message", mensagemAtual);
+      salvarMensagem(
+        mensagemAtual.mensagem,
+        mensagemAtual.usuario,
+        mensagemAtual.data
+      );
     }
+    setMensagem('')
   };
 
+  function salvarMensagem(mensagem, usuario, data) {
+    setMensagens((lista) => {
+      return [
+        ...lista,
+        <Mensagem send={true}>
+          <p>{mensagem}</p>
+          <p>
+            {usuario} {data}
+          </p>
+        </Mensagem>,
+      ];
+    });
+  }
   useEffect(() => {
     socket.on("receive_message", (data) => {
-      arr.push(data.mensagem);
-      mapear();
+      setMensagens((lista) => {
+        return [
+          ...lista,
+          <Mensagem send={false}>
+            <p>{data.mensagem}</p>
+            <p>
+              {data.usuario} {data.data}
+            </p>
+          </Mensagem>,
+        ];
+      });
     });
   }, [socket]);
 
   return (
     <Container className="main">
       <div className="cheader"></div>
-      <ScrollToBottom className="cbody">
-        <div>{mensagens}</div>
-      </ScrollToBottom>
+      <ScrollToBottom className="cbody">{mensagens}</ScrollToBottom>
       <div className="cfooter">
-        <input type="text" onChange={(e) => setMensagem(e.target.value)} />
+        <input
+          onKeyPress={(e) =>{
+            if(e.key === 'Enter'){
+              enviarMensagem()
+            }
+          } }
+          type="text"
+          value={mensagem}
+          onChange={(e) => setMensagem(e.target.value)}
+        />
         <button onClick={() => enviarMensagem()}>&#9658;</button>
       </div>
     </Container>
