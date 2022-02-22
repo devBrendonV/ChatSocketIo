@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from "react";
 import ScrollToBottom from "react-scroll-to-bottom";
 import { Container, Mensagem } from "./styles";
-const Chat = ({ socket, nome, sala }) => {
+const Chat = ({ socket, nome, sala,hidden,desconectar }) => {
   const [mensagem, setMensagem] = useState("");
   const [mensagens, setMensagens] = useState([]);
-  let arr = [""];
-
   const enviarMensagem = async () => {
     if (mensagem.trim().length > 0) {
       const mensagemAtual = {
@@ -57,7 +55,8 @@ const Chat = ({ socket, nome, sala }) => {
   }, [socket]);
 
   return (
-    <Container className="main">
+    <Container hidden={hidden} className="main">
+      <button onClick={()=>desconectar(false)}>x</button>
       <div className="cheader"></div>
       <ScrollToBottom className="cbody">{mensagens}</ScrollToBottom>
       <div className="cfooter">
