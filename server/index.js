@@ -17,12 +17,11 @@ io.on('connection', (socket)=>{
     console.log('User connected',socket.id) 
 
     socket.on('join_room',(data)=>{ 
-        socket.join()
-        console.log(`O usuario ${socket.id}, conectou na sala ${data}`)
+        socket.join(data.sala)
+        console.log(`O usuario ${data.nome}, com o id ${socket.id}, conectou na sala ${data.sala}`)
     })
 
     socket.on('send_message',(data)=>{
-        console.log(data)
         socket.to(data.sala).emit('receive_message',data)
     })
 

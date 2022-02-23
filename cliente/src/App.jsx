@@ -7,30 +7,39 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   width: 100vw;
   height: 100vh;
-  background-color: black;
+  background: linear-gradient(
+    122deg,
+    rgba(228, 51, 60, 1) 0%,
+    rgba(36, 31, 0, 1) 5%,
+    rgba(77, 36, 167, 1) 76%,
+    rgba(133, 100, 208, 1) 82%,
+    rgba(46, 0, 255, 1) 96%
+  );
 `;
 const CardLogin = styled.div`
   display: ${(prop) => (prop.hidden ? "none" : "flex")};
   flex-direction: column;
   align-items: center;
   width: 200px;
-  margin:auto;
-  padding:10px;
+  margin: auto;
+  padding: 10px;
   border-radius: 5px;
   height: 250px;
   background-color: #fff;
   font-size: 20px;
-  input{
-  font-size: 20px;
+  input {
+    font-size: 20px;
     width: 80%;
     margin-bottom: 10px;
+    outline: none;
   }
-  button{
+  button {
     font-size: 18px;
     margin-top: 70px;
-}
+  }
 `;
 function App() {
   const [nome, setNome] = useState("");
@@ -39,19 +48,19 @@ function App() {
 
   function logar() {
     if (nome !== "" && sala !== "") {
-      socket.emit("join_room", sala);
+      socket.emit("join_room", { sala: sala, nome: nome });
       setLogado(true);
     }
   }
-  function desconectar(){
-    setLogado(false)
-    socket.emit("join_room", '');
+  function desconectar() {
+    setLogado(false);
   }
   return (
     <Container className="App">
       <CardLogin hidden={logado}>
         <h3>CHAT-io</h3>
         <input
+          autoFocus
           type="text"
           placeholder="Insira seu nome..."
           onChange={(e) => {
@@ -59,6 +68,11 @@ function App() {
           }}
         />
         <input
+          onKeyPress={(e) => {
+            if (e.key === "Enter") {
+              logar();
+            }
+          }}
           type="text"
           placeholder="Insira a sala..."
           onChange={(e) => {
@@ -67,7 +81,14 @@ function App() {
         />
         <button onClick={() => logar()}>Entrar</button>
       </CardLogin>
-      <Chat desconectar={desconectar} hidden={!logado} socket={socket} nome={nome} sala={sala} />
+      <Chat
+        key={nome}
+        desconectar={desconectar}
+        hidden={!logado}
+        socket={socket}
+        nome={nome}
+        sala={sala}
+      />
     </Container>
   );
 }
